@@ -1,0 +1,476 @@
+<title>Econ vs No Econ, 2013–2025</title>
+<style>
+:root{
+  --paper:#f4f2ef;
+  --paper-raised:#ffffff;
+  --ink:#211d1b;
+  --ink-dim:#5c5450;
+  --line:#ddd6cf;
+  --crimson:#8c1d2b;
+  --crimson-ink:#6e1622;
+  --crimson-tint:#f6e4e2;
+  --gold:#8a6d1f;
+  --gold-tint:#f3ecd6;
+  --mono-tint:#eeeae4;
+  --focus:#2563eb;
+  --cat1:#2a78d6;
+  --cat2:#eb6834;
+  --cat3:#1baf7a;
+  --cat4:#eda100;
+  --cat5:#e87ba4;
+  --cat6:#008300;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#1b1815;
+    --paper-raised:#242019;
+    --ink:#ece5de;
+    --ink-dim:#a89e93;
+    --line:#3c352e;
+    --crimson:#e0687a;
+    --crimson-ink:#f2a3af;
+    --crimson-tint:#3a2126;
+    --gold:#d9c073;
+    --gold-tint:#3a3320;
+    --mono-tint:#2b2620;
+    --focus:#7aa2ff;
+    --cat1:#3987e5;
+    --cat2:#d95926;
+    --cat3:#199e70;
+    --cat4:#c98500;
+    --cat5:#d55181;
+    --cat6:#3ec93e;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1b1815;
+  --paper-raised:#242019;
+  --ink:#ece5de;
+  --ink-dim:#a89e93;
+  --line:#3c352e;
+  --crimson:#e0687a;
+  --crimson-ink:#f2a3af;
+  --crimson-tint:#3a2126;
+  --gold:#d9c073;
+  --gold-tint:#3a3320;
+  --mono-tint:#2b2620;
+  --focus:#7aa2ff;
+  --cat1:#3987e5;
+  --cat2:#d95926;
+  --cat3:#199e70;
+  --cat4:#c98500;
+  --cat5:#d55181;
+  --cat6:#3ec93e;
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px; margin:0 auto; padding:28px 20px 60px;}
+h1{font-size:24px; line-height:1.25; margin:0 0 6px; letter-spacing:-0.01em;}
+.dek{font-size:14.5px; line-height:1.55; color:var(--ink-dim); margin:0 0 22px; max-width:64ch;}
+.dek strong{color:var(--ink); font-weight:600;}
+
+.card{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:14px;
+  padding:20px 20px 16px; margin-bottom:18px;
+}
+
+/* year selector */
+.year-row{display:flex; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap;}
+.year-nav-btn{
+  width:30px; height:30px; border-radius:8px; border:1px solid var(--line);
+  background:var(--paper-raised); color:var(--ink); font-size:15px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; flex:none;
+}
+.year-nav-btn:hover{border-color:var(--crimson); color:var(--crimson);}
+.year-nav-btn:disabled{opacity:.35; cursor:default;}
+.year-track{
+  flex:1; min-width:220px; display:flex; gap:3px; overflow-x:auto; padding:2px 1px;
+}
+.year-btn{
+  flex:1; min-width:26px; padding:6px 2px; text-align:center; font-size:12px;
+  font-variant-numeric:tabular-nums; border-radius:7px; border:1px solid transparent;
+  background:transparent; color:var(--ink-dim); cursor:pointer; font-weight:500;
+}
+.year-btn:hover{background:var(--mono-tint); color:var(--ink);}
+.year-btn.active{background:var(--crimson); color:#fff; font-weight:700;}
+.play-btn{
+  width:30px; height:30px; border-radius:8px; border:1px solid var(--line);
+  background:var(--paper-raised); color:var(--ink); font-size:13px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; flex:none;
+}
+.play-btn.active{background:var(--crimson); color:#fff; border-color:var(--crimson);}
+
+/* chart layout */
+.chart-grid{display:grid; grid-template-columns:minmax(300px,380px) 1fr; gap:28px; align-items:center; margin-top:14px;}
+@media (max-width:640px){ .chart-grid{grid-template-columns:1fr;} }
+
+.pie-svg-wrap{position:relative;}
+#pie-svg{width:100%; height:auto; overflow:visible;}
+.pie-slice{transition:stroke-width .15s ease, opacity .15s ease; cursor:pointer;}
+.pie-slice.dim{opacity:.28;}
+.pie-slice:hover{stroke-width:38;}
+.bracket-arc{fill:none; stroke-linecap:round;}
+.bracket-label{font-size:11px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;}
+.bracket-label.econ{fill:var(--crimson-ink);}
+.bracket-label.noecon{fill:var(--ink-dim);}
+.bracket-label .bracket-pct{font-size:12.5px; font-weight:800; letter-spacing:0; text-transform:none; font-variant-numeric:tabular-nums; fill:var(--ink);}
+.pie-leader{stroke:var(--line); stroke-width:1;}
+.pie-outlabel{font-size:11px; fill:var(--ink-dim); font-variant-numeric:tabular-nums;}
+.pie-outlabel .pct{font-weight:700; fill:var(--ink);}
+.pie-center-year{font-size:30px; font-weight:800; fill:var(--ink); font-variant-numeric:tabular-nums;}
+.pie-center-label{font-size:10.5px; fill:var(--ink-dim); letter-spacing:.03em; text-transform:uppercase;}
+
+.legend{display:flex; flex-direction:column; gap:9px;}
+.legend-row{display:flex; align-items:flex-start; gap:10px; padding:7px 8px; border-radius:9px; cursor:pointer;}
+.legend-row:hover{background:var(--mono-tint);}
+.legend-row.dim{opacity:.4;}
+.legend-swatch{width:12px; height:12px; border-radius:3.5px; margin-top:3px; flex:none;}
+.legend-body{flex:1; min-width:0;}
+.legend-top{display:flex; justify-content:space-between; gap:10px; align-items:baseline;}
+.legend-name{font-size:13.5px; font-weight:600;}
+.legend-stat{font-size:13px; font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--ink-dim);}
+.legend-stat .pct{font-weight:700; color:var(--ink);}
+.legend-desc{font-size:12px; color:var(--ink-dim); line-height:1.4; margin-top:1px;}
+.legend-group-hdr{font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-dim); margin:6px 0 -2px 8px;}
+.legend-group-hdr.econ{color:var(--crimson-ink);}
+
+.legend-details{margin-top:5px;}
+.legend-details summary{cursor:pointer; font-size:11.5px; font-weight:600; color:var(--crimson-ink); user-select:none;}
+.legend-details summary:hover{text-decoration:underline;}
+.legend-majors{font-size:11.5px; color:var(--ink-dim); line-height:1.55; margin-top:6px; padding-left:1px;}
+
+.supergroup-bar{display:flex; height:10px; border-radius:5px; overflow:hidden; margin:16px 0 6px; border:1px solid var(--line);}
+.supergroup-seg{height:100%;}
+.supergroup-labels{display:flex; justify-content:space-between; font-size:12px; color:var(--ink-dim); font-variant-numeric:tabular-nums;}
+.supergroup-labels b{color:var(--ink); font-weight:700;}
+
+.note{font-size:12.5px; color:var(--ink-dim); line-height:1.55; margin-top:14px; max-width:70ch;}
+.note a{color:var(--ink-dim);}
+.methodology{font-size:13px; line-height:1.65; color:var(--ink-dim);}
+.methodology p{margin:0 0 10px;}
+.methodology strong{color:var(--ink);}
+details.method-details summary{cursor:pointer; font-size:13px; font-weight:600; color:var(--crimson-ink); margin-bottom:8px;}
+details.method-details ul{margin:6px 0 0; padding-left:20px;}
+details.method-details li{margin-bottom:6px;}
+
+.view-toggle{display:flex; gap:6px; margin-bottom:2px;}
+.view-toggle button{
+  border:1px solid var(--line); background:var(--paper-raised); color:var(--ink-dim);
+  font-size:12px; font-weight:600; padding:5px 12px; border-radius:7px; cursor:pointer;
+}
+.view-toggle button.active{background:var(--crimson); border-color:var(--crimson); color:#fff;}
+
+table.data-table{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:10px;}
+table.data-table th, table.data-table td{text-align:left; padding:6px 8px; border-bottom:1px solid var(--line);}
+table.data-table th{color:var(--ink-dim); font-weight:600; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em;}
+table.data-table td.num{text-align:right; font-variant-numeric:tabular-nums;}
+table.data-table tr:hover td{background:var(--mono-tint);}
+.cat-dot{display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:6px; vertical-align:middle;}
+</style>
+
+<div class="wrap">
+  <h1>Does your WSU major require economics? A 13-year picture</h1>
+  <p class="dek">Every WSU bachelor's major, sorted into six categories by how <strong>ECONS 101/102</strong> shows up in its degree requirements — merged with what fills the UCORE Social Science slot for majors that <em>don't</em> use econs. Weighted by each year's actual bachelor's degrees awarded (IPEDS), not just by major count. The outer ring groups the six into a binary split: <strong>Econ</strong> (101/102 required or offered as an option) vs. <strong>No Econ</strong> (a different course fills the slot, or it's genuinely open). Full primary-source catalog research, repeated independently for all 13 years 2013–2025.</p>
+
+  <div class="card">
+    <div class="year-row">
+      <button class="play-btn" id="playBtn" title="Play through years">&#9654;</button>
+      <button class="year-nav-btn" id="prevBtn" title="Previous year">&#8249;</button>
+      <div class="year-track" id="yearTrack"></div>
+      <button class="year-nav-btn" id="nextBtn" title="Next year">&#8250;</button>
+    </div>
+
+    <div class="chart-grid">
+      <div class="pie-svg-wrap">
+        <svg id="pie-svg" viewBox="-95 -95 410 410" role="img" aria-label="Pie chart of econ requirement categories"></svg>
+      </div>
+      <div>
+        <div class="legend" id="legend"></div>
+        <div class="supergroup-bar" id="supergroupBar"></div>
+        <div class="supergroup-labels" id="supergroupLabels"></div>
+      </div>
+    </div>
+
+    <p class="note" id="pieNote"></p>
+
+    <div class="view-toggle" style="margin-top:14px;">
+      <button class="active" data-view="chart" id="viewChartBtn">Chart</button>
+      <button data-view="table" id="viewTableBtn">Table</button>
+    </div>
+    <div id="tableWrap" style="display:none;"></div>
+  </div>
+
+  <div class="card methodology">
+    <p><strong>Reading the six categories.</strong> The first three (blue/orange/aqua) come from each major's own published Schedule of Studies for ECONS 101/102 specifically. The last three (yellow/magenta/green) apply only to majors that don't mention econs at all — a second, independent research pass asks what non-econ course (if any) actually fills their UCORE Social Science slot, so "No Econ" isn't just a leftover bucket, it's its own researched breakdown.</p>
+    <details class="method-details">
+      <summary>Methodology &amp; notes on data quality</summary>
+      <ul>
+        <li>Every year 2014–2024 (2013 and 2025 researched in an earlier pass) got the same full major-by-major catalog research as the anchor years — not an interpolation or a change-detection shortcut. Roughly 90 majors/options were checked per year against that year's actual printed catalog (rendered PDF pages plus <code>pdftotext -layout</code> extraction), across 77 research passes.</li>
+        <li>Sizes are annual bachelor's degrees awarded, from NCES IPEDS Completions data matched to each major via its CIP code (with a handful of majors' CIP classification drifting between adjacent codes across years — e.g. Economics reported under 45.0601 in most years but 45.0603 in others — both codes are summed for those majors). A major with no matched size data is excluded from that year's percentages, not counted as zero.</li>
+        <li>Some majors have multiple options/tracks that split between categories — e.g. within Mathematics &amp; Statistics, the Actuarial Science option has required ECONS 101 &amp; 102 flatly since at least 2017, while the Applied/Theoretical Math and Statistics options leave the slot open, and Secondary Teaching requires PSYCH 105. That whole major is coded <strong>Mixed</strong> rather than forced into one bucket.</li>
+        <li>A correction worth flagging as an example of what the re-research caught: in the <strong>2016</strong> catalog, all eight Carson College of Business majors were initially misread as requiring only one econ course, when the schedule in fact lists ECONS 101/102 as two separate first-year term slots (the "both" pattern seen in every adjacent year) — corrected after direct verification against the catalog text.</li>
+        <li>The <strong>Murrow College</strong> cluster (Strategic Communication + Journalism &amp; Media Production) required a judgment call. COM 101 ("Media and Society") is a required College Core course for every Murrow major, but the catalog is internally inconsistent about whether it fills the UCORE Social Science [SSCI] slot: WSU's own course-description entry for COM 101 first carries an explicit [SSCI] tag starting in the <strong>2015</strong> catalog (it's untagged in 2013–2014), yet the Schedule of Studies itself never prints that tag next to COM 101 the way it does for every other double-duty course in the same schedule — and from 2015–2022 it additionally lists a separate "Social Sciences [SSCI]" line alongside (not fulfilled by) COM 101, later replaced (2023–2025) by a flexible "complete 5 of 6 UCORE designations" bundle that still doesn't name COM 101. On balance, Murrow is coded <strong>Requires a different course</strong> for every year 2015–2025, once COM 101 carries its catalog-of-record [SSCI] tag, and <strong>Open</strong> for 2013–2014, when it carried no UCORE tag at all.</li>
+        <li>The Murrow College's eight sub-tracks (Strategic Communication ×4, Journalism &amp; Media Production ×4) are collapsed into one combined row each year, consistent across all 13 years, to avoid one college's internal restructuring from swinging the chart.</li>
+      </ul>
+    </details>
+  </div>
+</div>
+
+<script id="chart-data" type="application/json">{"2013": {"year": 2013, "n_majors": 74, "n_known_size": 68, "total_known_size": 5071, "cat_sum": {"1": 1006, "2": 700, "3": 110, "4": 1131, "5": 556, "6": 1568}, "cat_pct": {"1": 19.84, "2": 13.8, "3": 2.17, "4": 22.3, "5": 10.96, "6": 30.92}, "econ_total": 1816, "noecon_total": 3255, "econ_pct": 35.81, "noecon_pct": 64.19, "rows": [{"name": "Accounting", "cat": 1, "size": 166}, {"name": "Business Administration", "cat": 1, "size": 38}, {"name": "Entrepreneurship", "cat": 1, "size": 18}, {"name": "Finance", "cat": 1, "size": 152}, {"name": "International Business", "cat": 1, "size": 48}, {"name": "Management", "cat": 1, "size": 144}, {"name": "Management Information Systems", "cat": 1, "size": 133}, {"name": "Marketing", "cat": 1, "size": 83}, {"name": "Hospitality Business Management", "cat": 1, "size": 85}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 81}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 6}, {"name": "Construction Management", "cat": 1, "size": 52}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 17}, {"name": "Animal Sciences", "cat": 2, "size": 52}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 56}, {"name": "Field Crop Management", "cat": 2, "size": 13}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": 7}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 3}, {"name": "Turfgrass Management", "cat": 2, "size": 3}, {"name": "Food Science", "cat": 2, "size": 5}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 2, "size": 5}, {"name": "Human Development", "cat": 5, "size": 190}, {"name": "Landscape Architecture", "cat": 6, "size": 18}, {"name": "Interior Design", "cat": 6, "size": 28}, {"name": "Architectural Studies", "cat": 6, "size": 44}, {"name": "Civil Engineering", "cat": 2, "size": 113}, {"name": "Chemical Engineering", "cat": 2, "size": 35}, {"name": "Computer Engineering", "cat": 2, "size": 13}, {"name": "Bioengineering", "cat": 2, "size": 17}, {"name": "Mechanical Engineering", "cat": 2, "size": 187}, {"name": "Materials Science & Engineering", "cat": 2, "size": 21}, {"name": "Electrical Engineering", "cat": 2, "size": 77}, {"name": "Computer Science", "cat": 3, "size": 57}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 27}, {"name": "Earth Sciences", "cat": 2, "size": 13}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 36}, {"name": "Biology", "cat": 5, "size": 122}, {"name": "Chemistry", "cat": 6, "size": 10}, {"name": "Physics & Astronomy", "cat": 5, "size": 13}, {"name": "Mathematics & Statistics", "cat": 3, "size": 53}, {"name": "Zoology", "cat": 6, "size": 50}, {"name": "Biochemistry", "cat": 6, "size": 18}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 14}, {"name": "Microbiology", "cat": 6, "size": 23}, {"name": "Neuroscience", "cat": 4, "size": 24}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 5, "size": 78}, {"name": "Political Science", "cat": 4, "size": 104}, {"name": "Sociology", "cat": 4, "size": 63}, {"name": "Criminal Justice & Criminology", "cat": 6, "size": 167}, {"name": "Anthropology", "cat": 6, "size": 41}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 6}, {"name": "Psychology", "cat": 4, "size": 331}, {"name": "English", "cat": 5, "size": 127}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 43}, {"name": "Art", "cat": 6, "size": 32}, {"name": "Music", "cat": 5, "size": 26}, {"name": "Philosophy", "cat": 6, "size": 24}, {"name": "Digital Technology & Culture", "cat": 6, "size": 106}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 7}, {"name": "Social Sciences, BA", "cat": 6, "size": 501}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 17}, {"name": "Elementary Education Teacher Certificate", "cat": 4, "size": 132}, {"name": "Secondary Education core", "cat": 4, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 67}, {"name": "Sport Management", "cat": 6, "size": 45}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 11}, {"name": "Nursing, BSN", "cat": 4, "size": 371}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 11}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 6, "size": 391}]}, "2014": {"year": 2014, "n_majors": 74, "n_known_size": 67, "total_known_size": 4852, "cat_sum": {"1": 971, "2": 724, "3": 59, "4": 1155, "5": 543, "6": 1400}, "cat_pct": {"1": 20.01, "2": 14.92, "3": 1.22, "4": 23.8, "5": 11.19, "6": 28.85}, "econ_total": 1754, "noecon_total": 3098, "econ_pct": 36.15, "noecon_pct": 63.85, "rows": [{"name": "Accounting", "cat": 1, "size": 203}, {"name": "Business Administration", "cat": 1, "size": 43}, {"name": "Entrepreneurship", "cat": 1, "size": 14}, {"name": "Finance", "cat": 1, "size": 144}, {"name": "International Business", "cat": 1, "size": 40}, {"name": "Management", "cat": 1, "size": 137}, {"name": "Management Information Systems", "cat": 1, "size": 101}, {"name": "Marketing", "cat": 1, "size": 94}, {"name": "Hospitality Business Management", "cat": 1, "size": 88}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 60}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 5}, {"name": "Construction Management", "cat": 1, "size": 42}, {"name": "Civil Engineering", "cat": 2, "size": 122}, {"name": "Chemical Engineering", "cat": 2, "size": 30}, {"name": "Computer Engineering", "cat": 2, "size": 17}, {"name": "Bioengineering", "cat": 2, "size": 20}, {"name": "Mechanical Engineering", "cat": 2, "size": 214}, {"name": "Materials Science & Engineering", "cat": 2, "size": 16}, {"name": "Electrical Engineering", "cat": 2, "size": 92}, {"name": "Computer Science", "cat": 3, "size": 59}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 29}, {"name": "Animal Sciences", "cat": 2, "size": 44}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 48}, {"name": "Field Crop Management", "cat": 2, "size": 10}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": 1}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 4}, {"name": "Turfgrass Management", "cat": 2, "size": 7}, {"name": "Food Science", "cat": 2, "size": 10}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": 1}, {"name": "Human Development", "cat": 5, "size": 178}, {"name": "Landscape Architecture", "cat": 6, "size": 7}, {"name": "Interior Design", "cat": 6, "size": 19}, {"name": "Architectural Studies", "cat": 6, "size": 31}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 29}, {"name": "Earth Sciences", "cat": 2, "size": 11}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 20}, {"name": "Biology", "cat": 5, "size": 139}, {"name": "Chemistry", "cat": 6, "size": 13}, {"name": "Physics & Astronomy", "cat": 6, "size": 11}, {"name": "Mathematics & Statistics", "cat": 5, "size": 33}, {"name": "Zoology", "cat": 6, "size": 44}, {"name": "Biochemistry", "cat": 6, "size": 23}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 18}, {"name": "Microbiology", "cat": 6, "size": 20}, {"name": "Neuroscience", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 5, "size": 81}, {"name": "Political Science", "cat": 4, "size": 71}, {"name": "Sociology", "cat": 4, "size": 49}, {"name": "Criminal Justice & Criminology", "cat": 6, "size": 141}, {"name": "Anthropology", "cat": 6, "size": 34}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 7}, {"name": "Psychology", "cat": 4, "size": 350}, {"name": "English", "cat": 5, "size": 93}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 28}, {"name": "Art", "cat": 6, "size": 26}, {"name": "Music", "cat": 5, "size": 19}, {"name": "Philosophy", "cat": 6, "size": 27}, {"name": "Digital Technology & Culture", "cat": 6, "size": 91}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 5}, {"name": "Social Sciences, BA", "cat": 6, "size": 394}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 36}, {"name": "Elementary Education Teacher Certificate", "cat": 4, "size": 167}, {"name": "Secondary Education core", "cat": 4, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 102}, {"name": "Sport Management", "cat": 6, "size": 60}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 14}, {"name": "Nursing, BSN", "cat": 4, "size": 344}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 22}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 6, "size": 400}]}, "2015": {"year": 2015, "n_majors": 75, "n_known_size": 66, "total_known_size": 5335, "cat_sum": {"1": 1166, "2": 841, "3": 359, "4": 1448, "5": 377, "6": 1144}, "cat_pct": {"1": 21.86, "2": 15.76, "3": 6.73, "4": 27.14, "5": 7.07, "6": 21.44}, "econ_total": 2366, "noecon_total": 2969, "econ_pct": 44.35, "noecon_pct": 55.65, "rows": [{"name": "Accounting", "cat": 1, "size": 261}, {"name": "Business Administration", "cat": 1, "size": 42}, {"name": "Entrepreneurship", "cat": 1, "size": 18}, {"name": "Finance", "cat": 1, "size": 148}, {"name": "International Business", "cat": 1, "size": 66}, {"name": "Management", "cat": 1, "size": 167}, {"name": "Management Information Systems", "cat": 1, "size": 79}, {"name": "Marketing", "cat": 1, "size": 107}, {"name": "Hospitality Business Management", "cat": 1, "size": 168}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 60}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 6}, {"name": "Construction Management", "cat": 1, "size": 44}, {"name": "Civil Engineering", "cat": 2, "size": 137}, {"name": "Chemical Engineering", "cat": 2, "size": 52}, {"name": "Computer Engineering", "cat": 2, "size": 16}, {"name": "Bioengineering", "cat": 2, "size": 20}, {"name": "Mechanical Engineering", "cat": 2, "size": 244}, {"name": "Materials Science & Engineering", "cat": 2, "size": 6}, {"name": "Electrical Engineering", "cat": 2, "size": 107}, {"name": "Computer Science", "cat": 3, "size": 81}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 12}, {"name": "Animal Sciences", "cat": 2, "size": 69}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 55}, {"name": "Field Crop Management", "cat": 2, "size": 10}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": null}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 8}, {"name": "Turfgrass Management", "cat": 2, "size": 3}, {"name": "Food Science", "cat": 2, "size": 12}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": 3}, {"name": "Human Development", "cat": 5, "size": 157}, {"name": "Landscape Architecture", "cat": 6, "size": 7}, {"name": "Interior Design", "cat": 6, "size": 32}, {"name": "Architectural Studies", "cat": 6, "size": 50}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 36}, {"name": "Earth Sciences", "cat": 2, "size": 29}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 25}, {"name": "Forest Ecology & Management", "cat": 2, "size": null}, {"name": "Biology", "cat": 5, "size": 146}, {"name": "Chemistry", "cat": 6, "size": 10}, {"name": "Physics & Astronomy", "cat": 6, "size": 3}, {"name": "Mathematics & Statistics", "cat": 5, "size": 53}, {"name": "Zoology", "cat": 6, "size": 56}, {"name": "Biochemistry", "cat": 6, "size": 26}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 9}, {"name": "Microbiology", "cat": 6, "size": 25}, {"name": "Neuroscience", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 3, "size": 65}, {"name": "Political Science", "cat": 4, "size": 88}, {"name": "Sociology", "cat": 4, "size": 44}, {"name": "Criminal Justice & Criminology", "cat": 6, "size": 171}, {"name": "Anthropology", "cat": 6, "size": 43}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 13}, {"name": "Psychology", "cat": 4, "size": 351}, {"name": "English", "cat": 6, "size": 83}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 40}, {"name": "Art", "cat": 6, "size": 35}, {"name": "Music", "cat": 5, "size": 21}, {"name": "Philosophy", "cat": 6, "size": 11}, {"name": "Digital Technology & Culture", "cat": 6, "size": 121}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 4}, {"name": "Social Sciences, BA", "cat": 6, "size": 402}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 19}, {"name": "Elementary Education Teacher Certificate", "cat": 3, "size": 139}, {"name": "Secondary Education core", "cat": 6, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 124}, {"name": "Sport Management", "cat": 3, "size": 74}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 21}, {"name": "Nursing, BSN", "cat": 4, "size": 352}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 20}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 4, "size": 429}]}, "2016": {"year": 2016, "n_majors": 77, "n_known_size": 69, "total_known_size": 5268, "cat_sum": {"1": 1150, "2": 883, "3": 210, "4": 1555, "5": 269, "6": 1201}, "cat_pct": {"1": 21.83, "2": 16.76, "3": 3.99, "4": 29.52, "5": 5.11, "6": 22.8}, "econ_total": 2243, "noecon_total": 3025, "econ_pct": 42.58, "noecon_pct": 57.42, "rows": [{"name": "Accounting", "cat": 1, "size": 219}, {"name": "Business Administration", "cat": 1, "size": 47}, {"name": "Entrepreneurship", "cat": 1, "size": 18}, {"name": "Finance", "cat": 1, "size": 162}, {"name": "International Business", "cat": 1, "size": 53}, {"name": "Management", "cat": 1, "size": 156}, {"name": "Management Information Systems", "cat": 1, "size": 94}, {"name": "Marketing", "cat": 1, "size": 108}, {"name": "Hospitality Business Management", "cat": 1, "size": 183}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 56}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 7}, {"name": "Data Analytics (Economics concentration)", "cat": 2, "size": null}, {"name": "Construction Management", "cat": 1, "size": 47}, {"name": "Civil Engineering", "cat": 2, "size": 127}, {"name": "Chemical Engineering", "cat": 2, "size": 56}, {"name": "Computer Engineering", "cat": 2, "size": 16}, {"name": "Software Engineering", "cat": 2, "size": 0}, {"name": "Bioengineering", "cat": 2, "size": 29}, {"name": "Mechanical Engineering", "cat": 2, "size": 259}, {"name": "Materials Science & Engineering", "cat": 2, "size": 15}, {"name": "Electrical Engineering", "cat": 2, "size": 96}, {"name": "Computer Science", "cat": 3, "size": 84}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 34}, {"name": "Animal Sciences", "cat": 2, "size": 69}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 64}, {"name": "Field Crop Management", "cat": 2, "size": 16}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": 0}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 5}, {"name": "Turfgrass Management", "cat": 2, "size": 2}, {"name": "Food Science", "cat": 2, "size": 16}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": 6}, {"name": "Human Development", "cat": 4, "size": 155}, {"name": "Landscape Architecture", "cat": 6, "size": 1}, {"name": "Interior Design", "cat": 6, "size": 19}, {"name": "Architectural Studies", "cat": 6, "size": 36}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 15}, {"name": "Earth Sciences", "cat": 2, "size": 47}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 17}, {"name": "Forest Ecology & Management", "cat": 2, "size": 0}, {"name": "Biology", "cat": 5, "size": 159}, {"name": "Chemistry", "cat": 6, "size": 19}, {"name": "Physics & Astronomy", "cat": 6, "size": 13}, {"name": "Mathematics & Statistics", "cat": 5, "size": 44}, {"name": "Zoology", "cat": 6, "size": 47}, {"name": "Biochemistry", "cat": 6, "size": 21}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 15}, {"name": "Microbiology", "cat": 6, "size": 25}, {"name": "Neuroscience", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 5, "size": 66}, {"name": "Political Science", "cat": 4, "size": 80}, {"name": "Sociology", "cat": 4, "size": 39}, {"name": "Criminal Justice & Criminology", "cat": 6, "size": 179}, {"name": "Anthropology", "cat": 6, "size": 45}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 7}, {"name": "Psychology", "cat": 4, "size": 359}, {"name": "English", "cat": 6, "size": 93}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 45}, {"name": "Art", "cat": 6, "size": 17}, {"name": "Music", "cat": 6, "size": 13}, {"name": "Philosophy", "cat": 6, "size": 16}, {"name": "Digital Technology & Culture", "cat": 6, "size": 102}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 7}, {"name": "Social Sciences, BA", "cat": 6, "size": 412}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 25}, {"name": "Elementary Education Teacher Certificate", "cat": 3, "size": 126}, {"name": "Secondary Education core", "cat": 6, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 89}, {"name": "Sport Management", "cat": 6, "size": 63}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 13}, {"name": "Nursing, BSN", "cat": 4, "size": 386}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 23}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 4, "size": 386}]}, "2017": {"year": 2017, "n_majors": 77, "n_known_size": 69, "total_known_size": 5423, "cat_sum": {"1": 1202, "2": 907, "3": 334, "4": 1883, "5": 239, "6": 858}, "cat_pct": {"1": 22.16, "2": 16.73, "3": 6.16, "4": 34.72, "5": 4.41, "6": 15.82}, "econ_total": 2443, "noecon_total": 2980, "econ_pct": 45.05, "noecon_pct": 54.95, "rows": [{"name": "Accounting", "cat": 1, "size": 229}, {"name": "Business Administration", "cat": 1, "size": 30}, {"name": "Entrepreneurship", "cat": 1, "size": 14}, {"name": "Finance", "cat": 1, "size": 158}, {"name": "International Business", "cat": 1, "size": 36}, {"name": "Management", "cat": 1, "size": 150}, {"name": "Management Information Systems", "cat": 1, "size": 119}, {"name": "Marketing", "cat": 1, "size": 140}, {"name": "Hospitality Business Management", "cat": 1, "size": 233}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 46}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 1}, {"name": "Data Analytics (Economics concentration)", "cat": 1, "size": null}, {"name": "Construction Management", "cat": 1, "size": 46}, {"name": "Civil Engineering", "cat": 2, "size": 129}, {"name": "Chemical Engineering", "cat": 2, "size": 57}, {"name": "Computer Engineering", "cat": 2, "size": 17}, {"name": "Software Engineering", "cat": 2, "size": 0}, {"name": "Bioengineering", "cat": 2, "size": 19}, {"name": "Mechanical Engineering", "cat": 2, "size": 264}, {"name": "Materials Science & Engineering", "cat": 2, "size": 28}, {"name": "Electrical Engineering", "cat": 2, "size": 122}, {"name": "Computer Science", "cat": 3, "size": 106}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 21}, {"name": "Animal Sciences", "cat": 2, "size": 48}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 82}, {"name": "Field Crop Management", "cat": 2, "size": 17}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": 0}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 6}, {"name": "Turfgrass Management", "cat": 2, "size": 3}, {"name": "Food Science", "cat": 2, "size": 12}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": 7}, {"name": "Human Development", "cat": 4, "size": 173}, {"name": "Landscape Architecture", "cat": 6, "size": 9}, {"name": "Interior Design", "cat": 4, "size": 28}, {"name": "Architectural Studies", "cat": 6, "size": 27}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 3}, {"name": "Earth Sciences", "cat": 2, "size": 71}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 7}, {"name": "Forest Ecology & Management", "cat": 2, "size": 1}, {"name": "Biology", "cat": 5, "size": 139}, {"name": "Chemistry", "cat": 6, "size": 11}, {"name": "Physics & Astronomy", "cat": 6, "size": 7}, {"name": "Mathematics & Statistics", "cat": 5, "size": 47}, {"name": "Zoology", "cat": 6, "size": 60}, {"name": "Biochemistry", "cat": 6, "size": 24}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 21}, {"name": "Microbiology", "cat": 6, "size": 26}, {"name": "Neuroscience", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 5, "size": 53}, {"name": "Political Science", "cat": 4, "size": 66}, {"name": "Sociology", "cat": 4, "size": 50}, {"name": "Criminal Justice & Criminology", "cat": 4, "size": 186}, {"name": "Anthropology", "cat": 6, "size": 33}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 15}, {"name": "Psychology", "cat": 4, "size": 403}, {"name": "English", "cat": 6, "size": 76}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 22}, {"name": "Art", "cat": 6, "size": 15}, {"name": "Music", "cat": 6, "size": 17}, {"name": "Philosophy", "cat": 6, "size": 11}, {"name": "Digital Technology & Culture", "cat": 6, "size": 102}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 2}, {"name": "Social Sciences, BA", "cat": 6, "size": 373}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 24}, {"name": "Elementary Education Teacher Certificate", "cat": 3, "size": 159}, {"name": "Secondary Education core", "cat": 6, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 108}, {"name": "Sport Management", "cat": 3, "size": 69}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 13}, {"name": "Nursing, BSN", "cat": 4, "size": 366}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 26}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 4, "size": 440}]}, "2018": {"year": 2018, "n_majors": 77, "n_known_size": 69, "total_known_size": 5117, "cat_sum": {"1": 1193, "2": 895, "3": 339, "4": 1633, "5": 256, "6": 801}, "cat_pct": {"1": 23.31, "2": 17.49, "3": 6.62, "4": 31.91, "5": 5.0, "6": 15.65}, "econ_total": 2427, "noecon_total": 2690, "econ_pct": 47.43, "noecon_pct": 52.57, "rows": [{"name": "Accounting", "cat": 1, "size": 221}, {"name": "Business Administration", "cat": 1, "size": 29}, {"name": "Entrepreneurship", "cat": 1, "size": 15}, {"name": "Finance", "cat": 1, "size": 150}, {"name": "International Business", "cat": 1, "size": 47}, {"name": "Management", "cat": 1, "size": 191}, {"name": "Management Information Systems", "cat": 1, "size": 114}, {"name": "Marketing", "cat": 1, "size": 133}, {"name": "Hospitality Business Management", "cat": 1, "size": 189}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 49}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 10}, {"name": "Data Analytics (Economics concentration)", "cat": 1, "size": null}, {"name": "Construction Management", "cat": 1, "size": 45}, {"name": "Civil Engineering", "cat": 2, "size": 99}, {"name": "Chemical Engineering", "cat": 2, "size": 51}, {"name": "Computer Engineering", "cat": 2, "size": 17}, {"name": "Software Engineering", "cat": 2, "size": 0}, {"name": "Bioengineering", "cat": 2, "size": 17}, {"name": "Mechanical Engineering", "cat": 2, "size": 266}, {"name": "Materials Science & Engineering", "cat": 2, "size": 30}, {"name": "Electrical Engineering", "cat": 2, "size": 135}, {"name": "Computer Science", "cat": 3, "size": 134}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 21}, {"name": "Animal Sciences", "cat": 2, "size": 70}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 70}, {"name": "Field Crop Management", "cat": 2, "size": 23}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": 0}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 8}, {"name": "Turfgrass Management", "cat": 2, "size": 4}, {"name": "Food Science", "cat": 2, "size": 8}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": 2}, {"name": "Human Development", "cat": 4, "size": 157}, {"name": "Landscape Architecture", "cat": 4, "size": 7}, {"name": "Interior Design", "cat": 4, "size": 24}, {"name": "Architectural Studies", "cat": 4, "size": 26}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 0}, {"name": "Earth Sciences", "cat": 2, "size": 74}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 1}, {"name": "Forest Ecology & Management", "cat": 2, "size": 1}, {"name": "Biology", "cat": 5, "size": 128}, {"name": "Chemistry", "cat": 6, "size": 13}, {"name": "Physics & Astronomy", "cat": 6, "size": 10}, {"name": "Mathematics & Statistics", "cat": 5, "size": 46}, {"name": "Zoology", "cat": 6, "size": 61}, {"name": "Biochemistry", "cat": 5, "size": 17}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 20}, {"name": "Microbiology", "cat": 6, "size": 30}, {"name": "Neuroscience", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 5, "size": 65}, {"name": "Political Science", "cat": 4, "size": 82}, {"name": "Sociology", "cat": 4, "size": 35}, {"name": "Criminal Justice & Criminology", "cat": 4, "size": 171}, {"name": "Anthropology", "cat": 6, "size": 28}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 14}, {"name": "Psychology", "cat": 4, "size": 385}, {"name": "English", "cat": 6, "size": 80}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 19}, {"name": "Art", "cat": 6, "size": 23}, {"name": "Music", "cat": 6, "size": 17}, {"name": "Philosophy", "cat": 6, "size": 11}, {"name": "Digital Technology & Culture", "cat": 6, "size": 95}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 8}, {"name": "Social Sciences, BA", "cat": 6, "size": 370}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 25}, {"name": "Elementary Education Teacher Certificate", "cat": 3, "size": 142}, {"name": "Secondary Education core", "cat": 6, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 113}, {"name": "Sport Management", "cat": 3, "size": 63}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 15}, {"name": "Nursing, BSN", "cat": 4, "size": 377}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 24}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 4, "size": 192}]}, "2019": {"year": 2019, "n_majors": 77, "n_known_size": 69, "total_known_size": 5357, "cat_sum": {"1": 1204, "2": 987, "3": 379, "4": 1682, "5": 382, "6": 723}, "cat_pct": {"1": 22.48, "2": 18.42, "3": 7.07, "4": 31.4, "5": 7.13, "6": 13.5}, "econ_total": 2570, "noecon_total": 2787, "econ_pct": 47.97, "noecon_pct": 52.03, "rows": [{"name": "Accounting", "cat": 1, "size": 207}, {"name": "Business Administration", "cat": 1, "size": 41}, {"name": "Entrepreneurship", "cat": 1, "size": 16}, {"name": "Finance", "cat": 1, "size": 172}, {"name": "International Business", "cat": 1, "size": 51}, {"name": "Management", "cat": 1, "size": 146}, {"name": "Management Information Systems", "cat": 1, "size": 138}, {"name": "Marketing", "cat": 1, "size": 144}, {"name": "Hospitality Business Management", "cat": 1, "size": 175}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 59}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 6}, {"name": "Data Analytics (Economics concentration)", "cat": 1, "size": null}, {"name": "Construction Management", "cat": 1, "size": 49}, {"name": "Civil Engineering", "cat": 2, "size": 135}, {"name": "Chemical Engineering", "cat": 2, "size": 55}, {"name": "Computer Engineering", "cat": 2, "size": 18}, {"name": "Software Engineering", "cat": 2, "size": 6}, {"name": "Bioengineering", "cat": 2, "size": 20}, {"name": "Mechanical Engineering", "cat": 2, "size": 270}, {"name": "Materials Science & Engineering", "cat": 2, "size": 25}, {"name": "Electrical Engineering", "cat": 2, "size": 138}, {"name": "Computer Science", "cat": 3, "size": 151}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 25}, {"name": "Animal Sciences", "cat": 2, "size": 69}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 66}, {"name": "Field Crop Management", "cat": 2, "size": 21}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": 0}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 9}, {"name": "Turfgrass Management", "cat": 2, "size": 2}, {"name": "Food Science", "cat": 2, "size": 9}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": 10}, {"name": "Human Development", "cat": 4, "size": 186}, {"name": "Landscape Architecture", "cat": 4, "size": 9}, {"name": "Interior Design", "cat": 4, "size": 20}, {"name": "Architectural Studies", "cat": 4, "size": 37}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 0}, {"name": "Earth Sciences", "cat": 2, "size": 113}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 0}, {"name": "Forest Ecology & Management", "cat": 2, "size": 6}, {"name": "Biology", "cat": 5, "size": 180}, {"name": "Chemistry", "cat": 6, "size": 17}, {"name": "Physics & Astronomy", "cat": 6, "size": 15}, {"name": "Mathematics & Statistics", "cat": 5, "size": 41}, {"name": "Zoology", "cat": 6, "size": 53}, {"name": "Biochemistry", "cat": 5, "size": 36}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 9}, {"name": "Microbiology", "cat": 6, "size": 27}, {"name": "Neuroscience", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 5, "size": 59}, {"name": "Political Science", "cat": 4, "size": 83}, {"name": "Sociology", "cat": 4, "size": 43}, {"name": "Criminal Justice & Criminology", "cat": 4, "size": 185}, {"name": "Anthropology", "cat": 6, "size": 34}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 10}, {"name": "Psychology", "cat": 4, "size": 446}, {"name": "English", "cat": 5, "size": 66}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 24}, {"name": "Art", "cat": 6, "size": 14}, {"name": "Music", "cat": 6, "size": 18}, {"name": "Philosophy", "cat": 6, "size": 12}, {"name": "Digital Technology & Culture", "cat": 6, "size": 106}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 2}, {"name": "Social Sciences, BA", "cat": 6, "size": 372}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 26}, {"name": "Elementary Education Teacher Certificate", "cat": 3, "size": 148}, {"name": "Secondary Education core", "cat": 5, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 108}, {"name": "Sport Management", "cat": 3, "size": 80}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 16}, {"name": "Nursing, BSN", "cat": 4, "size": 366}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 24}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 4, "size": 133}]}, "2020": {"year": 2020, "n_majors": 79, "n_known_size": 69, "total_known_size": 5460, "cat_sum": {"1": 1219, "2": 977, "3": 421, "4": 1514, "5": 544, "6": 785}, "cat_pct": {"1": 22.33, "2": 17.89, "3": 7.71, "4": 27.73, "5": 9.96, "6": 14.38}, "econ_total": 2617, "noecon_total": 2843, "econ_pct": 47.93, "noecon_pct": 52.07, "rows": [{"name": "Accounting", "cat": 1, "size": 216}, {"name": "Business Administration", "cat": 1, "size": 33}, {"name": "Entrepreneurship", "cat": 1, "size": 14}, {"name": "Finance", "cat": 1, "size": 198}, {"name": "International Business", "cat": 1, "size": 40}, {"name": "Management", "cat": 1, "size": 154}, {"name": "Management Information Systems", "cat": 1, "size": 135}, {"name": "Marketing", "cat": 1, "size": 181}, {"name": "Aging Business Management", "cat": 1, "size": null}, {"name": "Hospitality Business Management", "cat": 1, "size": 174}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 64}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 10}, {"name": "Data Analytics (Economics concentration)", "cat": 1, "size": null}, {"name": "Construction Management", "cat": 1, "size": 0}, {"name": "Civil Engineering", "cat": 2, "size": 97}, {"name": "Chemical Engineering", "cat": 2, "size": 57}, {"name": "Computer Engineering", "cat": 2, "size": 13}, {"name": "Software Engineering", "cat": 2, "size": 22}, {"name": "Bioengineering", "cat": 2, "size": 24}, {"name": "Mechanical Engineering", "cat": 2, "size": 294}, {"name": "Materials Science & Engineering", "cat": 2, "size": 31}, {"name": "Electrical Engineering", "cat": 2, "size": 113}, {"name": "Computer Science", "cat": 3, "size": 165}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 28}, {"name": "Animal Sciences", "cat": 2, "size": 103}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 58}, {"name": "Field Crop Management", "cat": 2, "size": 24}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": 0}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 2}, {"name": "Turfgrass Management", "cat": 2, "size": 1}, {"name": "Food Science", "cat": 3, "size": 17}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": 5}, {"name": "Human Development", "cat": 4, "size": 196}, {"name": "Landscape Architecture", "cat": 4, "size": 13}, {"name": "Interior Design", "cat": 4, "size": 34}, {"name": "Architectural Studies", "cat": 4, "size": 0}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 0}, {"name": "Earth Sciences", "cat": 2, "size": 102}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 0}, {"name": "Forest Ecology & Management", "cat": 2, "size": 8}, {"name": "Biology", "cat": 5, "size": 211}, {"name": "Chemistry", "cat": 6, "size": 20}, {"name": "Physics & Astronomy", "cat": 5, "size": 14}, {"name": "Mathematics & Statistics", "cat": 5, "size": 43}, {"name": "Zoology", "cat": 6, "size": 68}, {"name": "Biochemistry", "cat": 5, "size": 36}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 28}, {"name": "Microbiology", "cat": 6, "size": 31}, {"name": "Neuroscience", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 5, "size": 71}, {"name": "Political Science", "cat": 5, "size": 83}, {"name": "Sociology", "cat": 4, "size": 44}, {"name": "Criminal Justice & Criminology", "cat": 4, "size": 146}, {"name": "Anthropology", "cat": 6, "size": 26}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 9}, {"name": "Psychology", "cat": 4, "size": 415}, {"name": "English", "cat": 5, "size": 86}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 27}, {"name": "Art", "cat": 6, "size": 21}, {"name": "Music", "cat": 6, "size": 12}, {"name": "Philosophy", "cat": 6, "size": 16}, {"name": "Digital Technology & Culture", "cat": 6, "size": 127}, {"name": "Human Biology", "cat": 6, "size": null}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 1}, {"name": "Social Sciences, BA", "cat": 6, "size": 394}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 24}, {"name": "Elementary Education Teacher Certificate", "cat": 3, "size": 186}, {"name": "Secondary Education core", "cat": 5, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 125}, {"name": "Sport Management", "cat": 3, "size": 53}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 21}, {"name": "Nursing, BSN", "cat": 4, "size": 345}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 18}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 4, "size": 133}]}, "2021": {"year": 2021, "n_majors": 78, "n_known_size": 64, "total_known_size": 5384, "cat_sum": {"1": 1218, "2": 1018, "3": 417, "4": 1504, "5": 517, "6": 710}, "cat_pct": {"1": 22.62, "2": 18.91, "3": 7.75, "4": 27.93, "5": 9.6, "6": 13.19}, "econ_total": 2653, "noecon_total": 2731, "econ_pct": 49.28, "noecon_pct": 50.72, "rows": [{"name": "Accounting", "cat": 1, "size": 219}, {"name": "Business Administration", "cat": 1, "size": 29}, {"name": "Entrepreneurship", "cat": 1, "size": 20}, {"name": "Finance", "cat": 1, "size": 188}, {"name": "International Business", "cat": 1, "size": 35}, {"name": "Management", "cat": 1, "size": 175}, {"name": "Management Information Systems", "cat": 1, "size": 110}, {"name": "Marketing", "cat": 1, "size": 210}, {"name": "Hospitality Business Management", "cat": 1, "size": 162}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 63}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 7}, {"name": "Data Analytics (Economics concentration)", "cat": 1, "size": null}, {"name": "Construction Management", "cat": 1, "size": null}, {"name": "Civil Engineering", "cat": 2, "size": 130}, {"name": "Chemical Engineering", "cat": 2, "size": 44}, {"name": "Computer Engineering", "cat": 2, "size": 16}, {"name": "Software Engineering", "cat": 2, "size": 28}, {"name": "Bioengineering", "cat": 2, "size": 21}, {"name": "Mechanical Engineering", "cat": 2, "size": 279}, {"name": "Materials Science & Engineering", "cat": 2, "size": 35}, {"name": "Electrical Engineering", "cat": 2, "size": 140}, {"name": "Computer Science", "cat": 3, "size": 176}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 21}, {"name": "Animal Sciences", "cat": 2, "size": 111}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 55}, {"name": "Field Crop Management", "cat": 2, "size": 18}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": null}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 2}, {"name": "Turfgrass Management", "cat": 2, "size": 0}, {"name": "Food Science", "cat": 3, "size": 15}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": 5}, {"name": "Human Development", "cat": 4, "size": 190}, {"name": "Landscape Architecture", "cat": 4, "size": null}, {"name": "Interior Design", "cat": 4, "size": 33}, {"name": "Architectural Studies", "cat": 4, "size": null}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 0}, {"name": "Earth Sciences", "cat": 2, "size": 112}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 0}, {"name": "Forest Ecology & Management", "cat": 2, "size": 6}, {"name": "Biology", "cat": 5, "size": 256}, {"name": "Chemistry", "cat": 6, "size": 24}, {"name": "Physics & Astronomy", "cat": 5, "size": 14}, {"name": "Mathematics & Statistics", "cat": 5, "size": 47}, {"name": "Zoology", "cat": 6, "size": 50}, {"name": "Biochemistry", "cat": 5, "size": 33}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 20}, {"name": "Microbiology", "cat": 6, "size": 35}, {"name": "Neuroscience", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 5, "size": 61}, {"name": "Political Science", "cat": 4, "size": 104}, {"name": "Sociology", "cat": 4, "size": 48}, {"name": "Criminal Justice & Criminology", "cat": 4, "size": null}, {"name": "Anthropology", "cat": 6, "size": 28}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 5}, {"name": "Psychology", "cat": 4, "size": 486}, {"name": "English", "cat": 5, "size": 106}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 16}, {"name": "Art", "cat": 6, "size": 16}, {"name": "Music", "cat": 6, "size": 18}, {"name": "Philosophy", "cat": 6, "size": 17}, {"name": "Digital Technology & Culture", "cat": 6, "size": 137}, {"name": "Human Biology", "cat": 6, "size": null}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 2}, {"name": "Social Sciences, BA", "cat": 6, "size": 337}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 15}, {"name": "Elementary Education Teacher Certificate", "cat": 3, "size": 182}, {"name": "Secondary Education core", "cat": 6, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 97}, {"name": "Sport Management", "cat": 3, "size": 44}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 24}, {"name": "Nursing, BSN", "cat": 4, "size": 348}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 22}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 4, "size": 137}]}, "2022": {"year": 2022, "n_majors": 79, "n_known_size": 64, "total_known_size": 5364, "cat_sum": {"1": 1378, "2": 920, "3": 449, "4": 1474, "5": 505, "6": 638}, "cat_pct": {"1": 25.69, "2": 17.15, "3": 8.37, "4": 27.48, "5": 9.41, "6": 11.89}, "econ_total": 2747, "noecon_total": 2617, "econ_pct": 51.21, "noecon_pct": 48.79, "rows": [{"name": "Accounting", "cat": 1, "size": 204}, {"name": "Business Administration", "cat": 1, "size": 30}, {"name": "Entrepreneurship", "cat": 1, "size": 32}, {"name": "Finance", "cat": 1, "size": 244}, {"name": "International Business", "cat": 1, "size": 27}, {"name": "Management", "cat": 1, "size": 200}, {"name": "Management Information Systems", "cat": 1, "size": 114}, {"name": "Marketing", "cat": 1, "size": 255}, {"name": "Aging Business Management", "cat": 1, "size": null}, {"name": "Hospitality Business Management", "cat": 1, "size": 210}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 55}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 7}, {"name": "Data Analytics (Economics concentration)", "cat": 1, "size": null}, {"name": "Construction Management", "cat": 1, "size": null}, {"name": "Civil Engineering", "cat": 2, "size": 101}, {"name": "Chemical Engineering", "cat": 2, "size": 25}, {"name": "Computer Engineering", "cat": 2, "size": 15}, {"name": "Software Engineering", "cat": 2, "size": 31}, {"name": "Bioengineering", "cat": 2, "size": 31}, {"name": "Mechanical Engineering", "cat": 2, "size": 265}, {"name": "Materials Science & Engineering", "cat": 2, "size": 20}, {"name": "Electrical Engineering", "cat": 2, "size": 110}, {"name": "Computer Science", "cat": 3, "size": 177}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 23}, {"name": "Animal Sciences", "cat": 2, "size": 107}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 61}, {"name": "Field Crop Management", "cat": 2, "size": 15}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": null}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 4}, {"name": "Turfgrass Management", "cat": 2, "size": 2}, {"name": "Food Science", "cat": 3, "size": 12}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": 9}, {"name": "Human Development", "cat": 4, "size": 149}, {"name": "Landscape Architecture", "cat": 4, "size": null}, {"name": "Interior Design", "cat": 4, "size": 28}, {"name": "Architectural Studies", "cat": 4, "size": null}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 0}, {"name": "Earth Sciences", "cat": 2, "size": 104}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 0}, {"name": "Forest Ecology & Management", "cat": 2, "size": 6}, {"name": "Biology", "cat": 5, "size": 256}, {"name": "Chemistry", "cat": 6, "size": 19}, {"name": "Physics & Astronomy", "cat": 5, "size": 9}, {"name": "Mathematics & Statistics", "cat": 5, "size": 42}, {"name": "Zoology", "cat": 6, "size": 57}, {"name": "Biochemistry", "cat": 5, "size": 19}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 20}, {"name": "Microbiology", "cat": 6, "size": 26}, {"name": "Neuroscience", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 5, "size": 73}, {"name": "Political Science", "cat": 4, "size": 87}, {"name": "Sociology", "cat": 4, "size": 57}, {"name": "Criminal Justice & Criminology", "cat": 4, "size": null}, {"name": "Anthropology", "cat": 6, "size": 31}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 6}, {"name": "Psychology", "cat": 4, "size": 466}, {"name": "English", "cat": 5, "size": 106}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 26}, {"name": "Art", "cat": 6, "size": 23}, {"name": "Music", "cat": 6, "size": 15}, {"name": "Philosophy", "cat": 6, "size": 19}, {"name": "Digital Technology & Culture", "cat": 6, "size": 135}, {"name": "Human Biology", "cat": 6, "size": null}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 2}, {"name": "Social Sciences, BA", "cat": 6, "size": 250}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 26}, {"name": "Elementary Education Teacher Certificate", "cat": 3, "size": 194}, {"name": "Secondary Education core", "cat": 6, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 43}, {"name": "Sport Management", "cat": 3, "size": 66}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 15}, {"name": "Nursing, BSN", "cat": 4, "size": 370}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 98}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 4, "size": 135}]}, "2023": {"year": 2023, "n_majors": 82, "n_known_size": 64, "total_known_size": 4902, "cat_sum": {"1": 1115, "2": 799, "3": 285, "4": 1446, "5": 509, "6": 748}, "cat_pct": {"1": 22.75, "2": 16.3, "3": 5.81, "4": 29.5, "5": 10.38, "6": 15.26}, "econ_total": 2199, "noecon_total": 2703, "econ_pct": 44.86, "noecon_pct": 55.14, "rows": [{"name": "Accounting", "cat": 1, "size": 182}, {"name": "Business Administration", "cat": 1, "size": 22}, {"name": "Entrepreneurship", "cat": 1, "size": 30}, {"name": "Finance", "cat": 1, "size": 200}, {"name": "International Business", "cat": 1, "size": 16}, {"name": "Management", "cat": 1, "size": 194}, {"name": "Management Information Systems", "cat": 1, "size": 45}, {"name": "Marketing", "cat": 1, "size": 230}, {"name": "Aging Business Management", "cat": 1, "size": null}, {"name": "Hospitality Business Management", "cat": 1, "size": 145}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 45}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 6}, {"name": "Data Analytics (Economics concentration)", "cat": 1, "size": null}, {"name": "Construction Management", "cat": 1, "size": null}, {"name": "Civil Engineering", "cat": 2, "size": 86}, {"name": "Chemical Engineering", "cat": 2, "size": 35}, {"name": "Computer Engineering", "cat": 2, "size": 11}, {"name": "Software Engineering", "cat": 2, "size": 25}, {"name": "Bioengineering", "cat": 2, "size": 17}, {"name": "Mechanical Engineering", "cat": 2, "size": 221}, {"name": "Materials Science & Engineering", "cat": 2, "size": 15}, {"name": "Electrical Engineering", "cat": 2, "size": 71}, {"name": "Computer Science", "cat": 6, "size": 193}, {"name": "Cybersecurity", "cat": 3, "size": null}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 11}, {"name": "Animal Sciences", "cat": 2, "size": 104}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 46}, {"name": "Field Crop Management", "cat": 2, "size": 20}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": null}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 3}, {"name": "Turfgrass Management", "cat": 2, "size": 0}, {"name": "Human Nutrition & Food Systems", "cat": 2, "size": null}, {"name": "Food Science", "cat": 3, "size": 6}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": 4}, {"name": "Human Development", "cat": 4, "size": 135}, {"name": "Landscape Architecture", "cat": 4, "size": null}, {"name": "Interior Design", "cat": 4, "size": 21}, {"name": "Architectural Studies", "cat": 4, "size": null}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 0}, {"name": "Earth Sciences", "cat": 2, "size": 130}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 0}, {"name": "Forest Ecology & Management", "cat": 2, "size": 4}, {"name": "Biology", "cat": 5, "size": 243}, {"name": "Chemistry", "cat": 6, "size": 20}, {"name": "Physics & Astronomy", "cat": 5, "size": 14}, {"name": "Mathematics & Statistics", "cat": 5, "size": 54}, {"name": "Zoology", "cat": 6, "size": 37}, {"name": "Biochemistry", "cat": 5, "size": 26}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 25}, {"name": "Microbiology", "cat": 6, "size": 14}, {"name": "Neuroscience", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 5, "size": 78}, {"name": "Political Science", "cat": 4, "size": 73}, {"name": "Sociology", "cat": 4, "size": 55}, {"name": "Criminal Justice & Criminology", "cat": 4, "size": null}, {"name": "Anthropology", "cat": 6, "size": 34}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 4}, {"name": "Psychology", "cat": 4, "size": 513}, {"name": "English", "cat": 5, "size": 94}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 15}, {"name": "Art", "cat": 6, "size": 13}, {"name": "Music", "cat": 6, "size": 17}, {"name": "Philosophy", "cat": 6, "size": 13}, {"name": "Digital Technology & Culture", "cat": 6, "size": 124}, {"name": "Human Biology", "cat": 6, "size": null}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 2}, {"name": "Social Sciences, BA", "cat": 6, "size": 233}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 16}, {"name": "Elementary Education Teacher Certificate", "cat": 3, "size": 218}, {"name": "Secondary Education core", "cat": 6, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 0}, {"name": "Sport Management", "cat": 3, "size": 61}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 22}, {"name": "Nursing, BSN", "cat": 4, "size": 351}, {"name": "Pharmaceutical & Medical Sciences", "cat": 6, "size": null}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 136}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 4, "size": 124}]}, "2024": {"year": 2024, "n_majors": 83, "n_known_size": 65, "total_known_size": 4791, "cat_sum": {"1": 1100, "2": 829, "3": 246, "4": 1391, "5": 494, "6": 731}, "cat_pct": {"1": 22.96, "2": 17.3, "3": 5.13, "4": 29.03, "5": 10.31, "6": 15.26}, "econ_total": 2175, "noecon_total": 2616, "econ_pct": 45.4, "noecon_pct": 54.6, "rows": [{"name": "Accounting", "cat": 1, "size": 204}, {"name": "Business Administration", "cat": 1, "size": 20}, {"name": "Entrepreneurship", "cat": 1, "size": 41}, {"name": "Finance", "cat": 1, "size": 196}, {"name": "International Business", "cat": 1, "size": 14}, {"name": "Management", "cat": 1, "size": 188}, {"name": "Management Information Systems", "cat": 1, "size": 0}, {"name": "Marketing", "cat": 1, "size": 240}, {"name": "Aging Business Management", "cat": 1, "size": null}, {"name": "Hospitality Business Management", "cat": 1, "size": 140}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 50}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 7}, {"name": "Data Analytics (Economics concentration)", "cat": 2, "size": null}, {"name": "Construction Management", "cat": 1, "size": null}, {"name": "Civil Engineering", "cat": 2, "size": 84}, {"name": "Chemical Engineering", "cat": 2, "size": 43}, {"name": "Computer Engineering", "cat": 2, "size": 17}, {"name": "Software Engineering", "cat": 2, "size": 32}, {"name": "Bioengineering", "cat": 2, "size": 28}, {"name": "Mechanical Engineering", "cat": 2, "size": 237}, {"name": "Materials Science & Engineering", "cat": 2, "size": 8}, {"name": "Electrical Engineering", "cat": 2, "size": 92}, {"name": "Computer Science", "cat": 6, "size": 181}, {"name": "Cybersecurity", "cat": 3, "size": 0}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": null}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 15}, {"name": "Animal Sciences", "cat": 2, "size": 87}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 41}, {"name": "Field Crop Management", "cat": 2, "size": 13}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": null}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 4}, {"name": "Turfgrass Management", "cat": 2, "size": 2}, {"name": "Human Nutrition & Food Systems", "cat": 2, "size": null}, {"name": "Food Science", "cat": 3, "size": 2}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": 2}, {"name": "Human Development", "cat": 4, "size": 108}, {"name": "Landscape Architecture", "cat": 4, "size": null}, {"name": "Interior Design", "cat": 4, "size": 29}, {"name": "Architectural Studies", "cat": 4, "size": null}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 0}, {"name": "Earth Sciences", "cat": 2, "size": 117}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 0}, {"name": "Forest Ecology & Management", "cat": 2, "size": 9}, {"name": "Biology", "cat": 5, "size": 236}, {"name": "Chemistry", "cat": 6, "size": 16}, {"name": "Physics & Astronomy", "cat": 5, "size": 17}, {"name": "Mathematics & Statistics", "cat": 5, "size": 55}, {"name": "Zoology", "cat": 6, "size": 39}, {"name": "Biochemistry", "cat": 5, "size": 36}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 29}, {"name": "Microbiology", "cat": 6, "size": 19}, {"name": "Neuroscience", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "History (general)", "cat": 5, "size": 59}, {"name": "Political Science", "cat": 4, "size": 80}, {"name": "Sociology", "cat": 4, "size": 49}, {"name": "Criminal Justice & Criminology", "cat": 4, "size": null}, {"name": "Anthropology", "cat": 6, "size": 34}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 1}, {"name": "Psychology", "cat": 4, "size": 531}, {"name": "English", "cat": 5, "size": 91}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 18}, {"name": "Art", "cat": 6, "size": 17}, {"name": "Music", "cat": 6, "size": 10}, {"name": "Philosophy", "cat": 6, "size": 7}, {"name": "Digital Technology & Culture", "cat": 6, "size": 126}, {"name": "Human Biology", "cat": 6, "size": null}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 4}, {"name": "Social Sciences, BA", "cat": 6, "size": 228}, {"name": "Public Health, BS", "cat": 4, "size": null}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 20}, {"name": "Elementary Education Teacher Certificate", "cat": 3, "size": 188}, {"name": "Secondary Education core", "cat": 5, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 0}, {"name": "Sport Management", "cat": 3, "size": 56}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 16}, {"name": "Nursing, BSN", "cat": 4, "size": 295}, {"name": "Pharmaceutical & Medical Sciences", "cat": 6, "size": null}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 137}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 4, "size": 126}]}, "2025": {"year": 2025, "n_majors": 84, "n_known_size": 69, "total_known_size": 4915.8, "cat_sum": {"1": 1014, "2": 654, "3": 290, "4": 1772.8000000000002, "5": 316, "6": 869}, "cat_pct": {"1": 20.63, "2": 13.3, "3": 5.9, "4": 36.06, "5": 6.43, "6": 17.68}, "econ_total": 1958, "noecon_total": 2957.8, "econ_pct": 39.83, "noecon_pct": 60.17, "rows": [{"name": "Accounting", "cat": 1, "size": 187}, {"name": "Business Administration", "cat": 1, "size": 56}, {"name": "Entrepreneurship", "cat": 1, "size": 26}, {"name": "Finance", "cat": 1, "size": 102}, {"name": "International Business", "cat": 1, "size": 62}, {"name": "Management", "cat": 1, "size": 181}, {"name": "Management Information Systems", "cat": 1, "size": 121}, {"name": "Marketing", "cat": 1, "size": 74}, {"name": "Aging Business Management", "cat": 1, "size": null}, {"name": "Hospitality Business Management", "cat": 1, "size": 84}, {"name": "Wine & Beverage Business Management", "cat": 1, "size": null}, {"name": "Economic Sciences, BS", "cat": 1, "size": 67}, {"name": "Agricultural and Food Business Economics, BS", "cat": 1, "size": 7}, {"name": "Data Analytics (Economics concentration)", "cat": 1, "size": null}, {"name": "Construction Management", "cat": 1, "size": 47}, {"name": "Agricultural Biotechnology", "cat": 2, "size": null}, {"name": "Agricultural Education", "cat": 2, "size": 2}, {"name": "Agricultural Technology & Production Management", "cat": 2, "size": 8}, {"name": "Animal Sciences", "cat": 2, "size": 37}, {"name": "Apparel, Merchandising, Design & Textiles", "cat": 2, "size": 63}, {"name": "Field Crop Management", "cat": 2, "size": 8}, {"name": "Fruit and Vegetable Management", "cat": 2, "size": 20}, {"name": "Organic and Sustainable Agriculture", "cat": 2, "size": 3}, {"name": "Turfgrass Management", "cat": 2, "size": 1}, {"name": "Social Studies, BA", "cat": 2, "size": null}, {"name": "Civil Engineering", "cat": 2, "size": 95}, {"name": "Chemical Engineering", "cat": 2, "size": 31}, {"name": "Computer Engineering", "cat": 2, "size": 22}, {"name": "Software Engineering", "cat": 2, "size": null}, {"name": "Bioengineering", "cat": 2, "size": 13}, {"name": "Mechanical Engineering", "cat": 2, "size": 181}, {"name": "Materials Science & Engineering", "cat": 2, "size": 9}, {"name": "Human Nutrition & Food Systems", "cat": 2, "size": 37}, {"name": "Environmental & Ecosystem Sciences", "cat": 2, "size": 29}, {"name": "Earth Sciences", "cat": 2, "size": 7}, {"name": "Wildlife Ecology & Conservation Sciences", "cat": 2, "size": 37}, {"name": "Electrical Engineering", "cat": 2, "size": 51}, {"name": "Food Science", "cat": 3, "size": 5}, {"name": "History (general)", "cat": 3, "size": 114}, {"name": "Computer Science", "cat": 3, "size": 31}, {"name": "Cybersecurity", "cat": 3, "size": null}, {"name": "Elementary Education Teacher Certificate", "cat": 3, "size": 139}, {"name": "Forest Ecology & Management", "cat": 3, "size": 1}, {"name": "Landscape, Nursery & Greenhouse Management", "cat": 6, "size": null}, {"name": "Human Development", "cat": 4, "size": 155}, {"name": "Political Science", "cat": 4, "size": 124}, {"name": "Sociology", "cat": 4, "size": 62}, {"name": "Criminal Justice & Criminology", "cat": 4, "size": 127}, {"name": "Anthropology", "cat": 6, "size": 39}, {"name": "Comparative Ethnic Studies", "cat": 6, "size": 21}, {"name": "Biology", "cat": 5, "size": 123}, {"name": "Chemistry", "cat": 6, "size": 10}, {"name": "Physics & Astronomy", "cat": 5, "size": 9}, {"name": "Mathematics & Statistics", "cat": 5, "size": 43}, {"name": "Psychology", "cat": 4, "size": 281}, {"name": "English", "cat": 5, "size": 122}, {"name": "Foreign Languages & Cultures", "cat": 6, "size": 47}, {"name": "Art", "cat": 6, "size": 49}, {"name": "Music", "cat": 6, "size": 14}, {"name": "Philosophy", "cat": 6, "size": 13}, {"name": "Digital Technology & Culture", "cat": 6, "size": null}, {"name": "Human Biology", "cat": 6, "size": null}, {"name": "Women's Gender & Sexuality Studies", "cat": 6, "size": 14}, {"name": "Zoology", "cat": 6, "size": 42}, {"name": "Architectural Studies", "cat": 4, "size": 60}, {"name": "Interior Design", "cat": 4, "size": 45}, {"name": "Landscape Architecture", "cat": 4, "size": 12}, {"name": "Secondary Education core", "cat": 5, "size": null}, {"name": "Kinesiology / Sport Science", "cat": 4, "size": 58}, {"name": "Sport Management", "cat": 6, "size": 35}, {"name": "Sports Medicine & Athletic Training", "cat": 4, "size": 11}, {"name": "Nursing, BSN", "cat": 4, "size": 366}, {"name": "Pharmaceutical & Medical Sciences", "cat": 6, "size": null}, {"name": "Biochemistry", "cat": 5, "size": 19}, {"name": "Genetics & Cell Biology", "cat": 6, "size": 19}, {"name": "Microbiology", "cat": 6, "size": 22}, {"name": "Neuroscience", "cat": 4, "size": 26}, {"name": "Public Health, BS", "cat": 4, "size": null}, {"name": "DVM pre-vet prerequisites", "cat": 6, "size": null}, {"name": "Nutrition & Exercise Physiology, BS", "cat": 4, "size": 11}, {"name": "Speech & Hearing Sciences, BA", "cat": 4, "size": 38}, {"name": "Social Sciences, BA", "cat": 6, "size": 544}, {"name": "Social Work", "cat": 4, "size": null}, {"name": "Murrow College majors (Strategic Communication + Journalism & Media Production)", "cat": 4, "size": 396.80000000000007}]}}</script>
+<script>
+const DATA = JSON.parse(document.getElementById('chart-data').textContent);
+const YEARS = Object.keys(DATA).map(Number).sort((a,b)=>a-b);
+
+const CAT_META = {
+  1:{name:"Requires both 101 & 102", short:"Both required", color:"var(--cat1)", group:"econ",
+     desc:"Both courses mandatory, no substitution."},
+  2:{name:"Requires one course", short:"One required", color:"var(--cat2)", group:"econ",
+     desc:"One specific ECONS course, or an explicit 101-or-102 choice — either way, mandatory."},
+  3:{name:"Lists econ as an option", short:"Econ as option", color:"var(--cat3)", group:"econ",
+     desc:"One choice among several electives/UCORE options, or just recommended — not required."},
+  4:{name:"Requires a different course", short:"Different course", color:"var(--cat4)", group:"noecon",
+     desc:"Every option flatly requires its own non-econ Social Science course instead."},
+  5:{name:"Mixed", short:"Mixed", color:"var(--cat5)", group:"noecon",
+     desc:"Some options/tracks in the major require a specific course (sometimes even econ itself, in just one track); others leave the slot open."},
+  6:{name:"No mentioned SSCI course — open", short:"Open", color:"var(--cat6)", group:"noecon",
+     desc:"Published requirements never point to any specific course for the slot."},
+};
+const CAT_ORDER = [1,2,3,4,5,6];
+
+let currentYear = YEARS[YEARS.length-1];
+let dimCat = null;
+let playing = false, playTimer = null;
+
+function fmtN(n){ return Math.round(n).toLocaleString(); }
+function fmtPct(n){ return n.toFixed(1)+"%"; }
+
+function buildYearTrack(){
+  const track = document.getElementById('yearTrack');
+  track.innerHTML = YEARS.map(y => `<button class="year-btn" data-year="${y}">${y}</button>`).join('');
+  track.querySelectorAll('.year-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ setYear(+btn.dataset.year); });
+  });
+}
+
+function setYear(y){
+  currentYear = y;
+  document.querySelectorAll('.year-btn').forEach(b=>{
+    b.classList.toggle('active', +b.dataset.year === y);
+  });
+  document.getElementById('prevBtn').disabled = y === YEARS[0];
+  document.getElementById('nextBtn').disabled = y === YEARS[YEARS.length-1];
+  render();
+}
+
+function polarToCartesian(cx, cy, r, angleDeg){
+  const a = (angleDeg-90) * Math.PI/180;
+  return { x: cx + r*Math.cos(a), y: cy + r*Math.sin(a) };
+}
+function describeArc(cx, cy, r, startAngle, endAngle){
+  const start = polarToCartesian(cx, cy, r, endAngle);
+  const end = polarToCartesian(cx, cy, r, startAngle);
+  const largeArc = endAngle - startAngle <= 180 ? "0" : "1";
+  return `M ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${r} ${r} 0 ${largeArc} 0 ${end.x.toFixed(2)} ${end.y.toFixed(2)}`;
+}
+
+function render(){
+  const yd = DATA[currentYear];
+  const cx=110, cy=110, r=72, sw=32;
+  const circ = 2*Math.PI*r;
+
+  // ---- pie donut ----
+  let cum = 0;
+  let svgParts = "";
+  let labelParts = "";
+  const angles = {}; // cat -> {start,end} in degrees
+
+  CAT_ORDER.forEach(c=>{
+    const val = yd.cat_sum[c] || 0;
+    const frac = yd.total_known_size ? val/yd.total_known_size : 0;
+    const len = frac*circ;
+    const startDeg = (cum/circ)*360;
+    const endDeg = startDeg + frac*360;
+    angles[c] = {start:startDeg, end:endDeg};
+    const meta = CAT_META[c];
+    const dimmed = dimCat!==null && dimCat!==c;
+    const tip = `${meta.name}: ${fmtN(val)} degrees/yr (${fmtPct(frac*100)})`;
+    svgParts += `<circle class="pie-slice${dimmed?' dim':''}" data-cat="${c}" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${meta.color}"
+      stroke-width="${sw}" stroke-dasharray="${len.toFixed(2)} ${(circ-len).toFixed(2)}" stroke-dashoffset="${-cum.toFixed(2)}"
+      transform="rotate(-90 ${cx} ${cy})"><title>${tip}</title></circle>`;
+
+    if(frac > 0.018){
+      const midAngle = startDeg + (endDeg-startDeg)/2;
+      const pt1 = polarToCartesian(cx, cy, r+sw/2, midAngle);
+      const pt2 = polarToCartesian(cx, cy, r+sw/2+14, midAngle);
+      const ptL = polarToCartesian(cx, cy, r+sw/2+18, midAngle);
+      const cosv = Math.sin((midAngle)*Math.PI/180);
+      const anchor = cosv > 0.12 ? "start" : cosv < -0.12 ? "end" : "middle";
+      labelParts += `<line class="pie-leader" x1="${pt1.x.toFixed(1)}" y1="${pt1.y.toFixed(1)}" x2="${pt2.x.toFixed(1)}" y2="${pt2.y.toFixed(1)}" />`;
+      labelParts += `<text class="pie-outlabel" x="${ptL.x.toFixed(1)}" y="${pt2.y.toFixed(1)}" text-anchor="${anchor}" dominant-baseline="middle"><tspan class="pct">${fmtPct(frac*100)}</tspan></text>`;
+    }
+    cum += len;
+  });
+
+  // ---- enveloping bracket: Econ (cats 1-3) vs No Econ (cats 4-6) ----
+  const econStart = angles[1] ? angles[1].start : 0;
+  const econEnd = angles[3] ? angles[3].end : angles[1] ? angles[1].end : 0;
+  const noEconStart = angles[4] ? angles[4].start : econEnd;
+  const noEconEnd = angles[6] ? angles[6].end : noEconStart;
+  const bracketR = r + sw/2 + 50;
+  const bracketLabelR = bracketR + 30;
+  let bracketParts = "";
+  if(econEnd > econStart){
+    bracketParts += `<path class="bracket-arc" d="${describeArc(cx,cy,bracketR,econStart+3,econEnd-3)}" stroke="var(--crimson)" stroke-width="2.5" />`;
+    const mid = econStart + (econEnd-econStart)/2;
+    const lp = polarToCartesian(cx, cy, bracketLabelR, mid);
+    bracketParts += `<text class="bracket-label econ" x="${lp.x.toFixed(1)}" y="${lp.y.toFixed(1)}" text-anchor="middle">
+      <tspan x="${lp.x.toFixed(1)}" dy="-2">Econ</tspan>
+      <tspan x="${lp.x.toFixed(1)}" dy="12" class="bracket-pct">${fmtPct(yd.econ_pct)}</tspan>
+    </text>`;
+  }
+  if(noEconEnd > noEconStart){
+    bracketParts += `<path class="bracket-arc" d="${describeArc(cx,cy,bracketR,noEconStart+3,noEconEnd-3)}" stroke="var(--ink-dim)" stroke-width="2.5" />`;
+    const mid = noEconStart + (noEconEnd-noEconStart)/2;
+    const lp = polarToCartesian(cx, cy, bracketLabelR, mid);
+    bracketParts += `<text class="bracket-label noecon" x="${lp.x.toFixed(1)}" y="${lp.y.toFixed(1)}" text-anchor="middle">
+      <tspan x="${lp.x.toFixed(1)}" dy="-2">No Econ</tspan>
+      <tspan x="${lp.x.toFixed(1)}" dy="12" class="bracket-pct">${fmtPct(yd.noecon_pct)}</tspan>
+    </text>`;
+  }
+
+  svgParts += `<text class="pie-center-year" x="${cx}" y="${cy-2}" text-anchor="middle">${currentYear}</text>`;
+  svgParts += `<text class="pie-center-label" x="${cx}" y="${cy+18}" text-anchor="middle">${fmtN(yd.total_known_size)} deg/yr</text>`;
+
+  document.getElementById('pie-svg').innerHTML = svgParts + labelParts + bracketParts;
+  document.getElementById('pie-svg').setAttribute('viewBox', `-95 -95 410 410`);
+
+  document.querySelectorAll('.pie-slice').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const c = +el.dataset.cat;
+      dimCat = dimCat===c ? null : c;
+      render();
+    });
+  });
+
+  // ---- legend ----
+  const legend = document.getElementById('legend');
+  let html = `<div class="legend-group-hdr econ">Econ</div>`;
+  [1,2,3].forEach(c=>{ html += legendRow(c, yd); });
+  html += `<div class="legend-group-hdr">No Econ</div>`;
+  [4,5,6].forEach(c=>{ html += legendRow(c, yd); });
+  legend.innerHTML = html;
+  legend.querySelectorAll('.legend-row').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const c = +el.dataset.cat;
+      dimCat = dimCat===c ? null : c;
+      render();
+    });
+  });
+  // the majors disclosure lives inside each row; keep its open/close click from
+  // also toggling the row's dim state (and from being wiped out by the re-render)
+  legend.querySelectorAll('.legend-details').forEach(el=>{
+    el.addEventListener('click', e=>e.stopPropagation());
+  });
+
+  function legendRow(c, yd){
+    const meta = CAT_META[c];
+    const val = yd.cat_sum[c] || 0;
+    const pct = yd.cat_pct[c] || 0;
+    const dimmed = dimCat!==null && dimCat!==c;
+    const majors = yd.rows.filter(r=>r.cat===c).sort((a,b)=>(b.size||0)-(a.size||0));
+    const majorsList = majors.length
+      ? majors.map(r => r.size==null
+          ? `${r.name} <span style="opacity:.55">(no size data)</span>`
+          : `${r.name} <span style="opacity:.6">(${fmtN(r.size)})</span>`).join(", ")
+      : `<em>No majors in this category this year.</em>`;
+    return `<div class="legend-row${dimmed?' dim':''}" data-cat="${c}">
+      <span class="legend-swatch" style="background:${meta.color}"></span>
+      <div class="legend-body">
+        <div class="legend-top">
+          <span class="legend-name">${meta.name}</span>
+          <span class="legend-stat"><span class="pct">${fmtPct(pct)}</span> (${fmtN(val)} deg/yr)</span>
+        </div>
+        <div class="legend-desc">${meta.desc}</div>
+        <details class="legend-details">
+          <summary>${majors.length} major${majors.length===1?'':'s'}</summary>
+          <div class="legend-majors">${majorsList}</div>
+        </details>
+      </div>
+    </div>`;
+  }
+
+  // ---- supergroup bar ----
+  const bar = document.getElementById('supergroupBar');
+  bar.innerHTML = `<div class="supergroup-seg" style="width:${yd.econ_pct}%; background:var(--crimson)"></div>` +
+                   `<div class="supergroup-seg" style="width:${yd.noecon_pct}%; background:var(--line)"></div>`;
+  document.getElementById('supergroupLabels').innerHTML =
+    `<span><b>${fmtPct(yd.econ_pct)}</b> Econ</span><span><b>${fmtPct(yd.noecon_pct)}</b> No Econ</span>`;
+
+  document.getElementById('pieNote').textContent =
+    `Weighted by annual bachelor's degrees awarded (IPEDS proxy), ${currentYear}. ${yd.n_majors - yd.n_known_size} of ${yd.n_majors} majors/options have no matched size data and are excluded from these percentages.`;
+
+  renderTable(yd);
+}
+
+function renderTable(yd){
+  const wrap = document.getElementById('tableWrap');
+  const rows = [...yd.rows].sort((a,b)=> (b.size||0) - (a.size||0));
+  let html = `<table class="data-table"><thead><tr>
+    <th>Major</th><th>Category</th><th class="num">Degrees/yr</th>
+  </tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const meta = CAT_META[r.cat];
+    html += `<tr>
+      <td>${r.name}</td>
+      <td><span class="cat-dot" style="background:${meta.color}"></span>${meta.name}</td>
+      <td class="num">${r.size==null ? '—' : fmtN(r.size)}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  wrap.innerHTML = html;
+}
+
+document.getElementById('prevBtn').addEventListener('click', ()=>{
+  const i = YEARS.indexOf(currentYear);
+  if(i>0) setYear(YEARS[i-1]);
+});
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  const i = YEARS.indexOf(currentYear);
+  if(i<YEARS.length-1) setYear(YEARS[i+1]);
+});
+document.getElementById('playBtn').addEventListener('click', function(){
+  playing = !playing;
+  this.classList.toggle('active', playing);
+  this.innerHTML = playing ? '&#10074;&#10074;' : '&#9654;';
+  if(playing){
+    playTimer = setInterval(()=>{
+      const i = YEARS.indexOf(currentYear);
+      if(i < YEARS.length-1) setYear(YEARS[i+1]);
+      else { setYear(YEARS[0]); }
+    }, 1400);
+  } else {
+    clearInterval(playTimer);
+  }
+});
+
+document.getElementById('viewChartBtn').addEventListener('click', function(){
+  this.classList.add('active');
+  document.getElementById('viewTableBtn').classList.remove('active');
+  document.querySelector('.chart-grid').style.display = 'grid';
+  document.getElementById('tableWrap').style.display = 'none';
+});
+document.getElementById('viewTableBtn').addEventListener('click', function(){
+  this.classList.add('active');
+  document.getElementById('viewChartBtn').classList.remove('active');
+  document.querySelector('.chart-grid').style.display = 'none';
+  document.getElementById('tableWrap').style.display = 'block';
+});
+
+buildYearTrack();
+setYear(currentYear);
+</script>
